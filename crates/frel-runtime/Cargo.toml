@@ -1,0 +1,10 @@
+[package]
+name = "frel-runtime"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+smallvec = "1"
+thunderdome = "0.6"
+frel-core = "0.1.0"
+

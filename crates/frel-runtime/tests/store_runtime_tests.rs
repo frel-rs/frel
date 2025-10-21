@@ -1,7 +1,7 @@
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-use frel::store::{
+use frel_runtime::store::{
     DerivedStore, EmittingStore, Store, StoreCallback, StoreEffects, StoreKey, StoreRuntime, StoreRuntimeImpl,
     SubscriptionKey, mk_eq_fn,
 };
@@ -128,7 +128,7 @@ fn const_erased_panics_on_set_value() {
 
     impl Store for PanicWriteStore {
         fn get_any(&self) -> &dyn std::any::Any { &*self.value }
-        fn set_any(&mut self, _: Box<dyn std::any::Any>, _: &mut frel::store::SubSink) {
+        fn set_any(&mut self, _: Box<dyn std::any::Any>, _: &mut frel_runtime::store::SubSink) {
             panic!("attempt to write const store, this is a framework error (or you've been naughty)")
         }
         fn subscribe(&mut self, _: SubscriptionKey, _: u64) -> bool { false }

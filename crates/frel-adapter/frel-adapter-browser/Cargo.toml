@@ -1,0 +1,10 @@
+[package]
+name = "frel-adapter-browser"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+frel-core = "0.1.0"
+frel-encoding = "0.1.0"
+frel-runtime = "0.1.0"
+

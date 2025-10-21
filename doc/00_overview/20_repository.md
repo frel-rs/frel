@@ -1,31 +1,32 @@
 # Repository Structure
 
 ```text
-/doc/                  # design docs, living specs
+/doc/                        # design docs, living specs
 
-/frel/frel/            # Public API surface
+/crates/frel/                # Public API surface
 
-/frel/core             # Shared by the compiler and the runtime, must keep it macro-safe
-/frel/core/types       # Core types shared across crates (DIP, Color, Instruction enums, errors)
-/frel/core/fir         # FIR data structures + opcodes + tiny encoder/decoder helpers
+/crates/frel-core            # Shared by the compiler and the runtime, must keep it macro-safe
+/crates/frel-core/types      # Core types shared across crates (DIP, Color, Instruction enums, errors)
+/crates/frel-core/fir        # FIR data structures + opcodes + tiny encoder/decoder helpers
 
-/frel/compiler         # Fragment Compiler (proc-macro) → emits FIR blobs
-/frel/compiler/dsl     # DSL surface (token types, pest grammar) for tests/tools only
+/crates/frel-compiler        # Fragment Compiler (proc-macro) → emits FIR blobs
+/crates/frel-compiler/dsl    # DSL surface (token types, pest grammar) for tests/tools only
 
-/frel/encoding         # Event/Patch binary encodings shared by renderer<->adapter
+/crates/frel-encoding        # Event/Patch binary encodings shared by renderer<->adapter
 
-/frel/runtime/         # 
-/frel/runtime/linker   # FIR -> instance linker
-/frel/runtime/store    # Reactive store implementation
-/frel/runtime/render   # Instruction applier + layout engine + patch generation
+/crates/frel-runtime/        # 
+/crates/frel-runtime/linker  # FIR -> instance linker
+/crates/frel-runtime/store   # Reactive store implementation
+/crates/frel-runtime/render  # Instruction applier + layout engine + patch generation
 
-/frel/adapter/browser  # Browser adapter PoC (inline mode first, worker later)
+/crates/frel-adapter         # Adapter crates
+/crates/frel-adapter/frel-adapter-browser  # Browser adapter PoC (inline mode first, worker later)
 
-/frel/lib              # Higher level fragments (tables, trees, editors etc.)
+/crates/frel-lib             # Higher level fragments (tables, trees, editors etc.)
 
-/tests/                # Integration tests 
+/tests/                      # Integration tests 
 
-/utils/                # shared utilities (can be split later)
+/utils/                      # shared utilities (can be split later)
 ```
 
 ## Published crates

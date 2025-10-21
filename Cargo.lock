@@ -5,10 +5,51 @@ version = 4
 [[package]]
 name = "frel"
 version = "0.1.0"
+
+[[package]]
+name = "frel-adapter-browser"
+version = "0.1.0"
 dependencies = [
+ "frel-core",
+ "frel-encoding",
+ "frel-runtime",
+]
+
+[[package]]
+name = "frel-compiler"
+version = "0.1.0"
+dependencies = [
+ "frel-core",
  "proc-macro2",
- "smallvec",
+ "quote",
  "syn",
+]
+
+[[package]]
+name = "frel-core"
+version = "0.1.0"
+
+[[package]]
+name = "frel-encoding"
+version = "0.1.0"
+dependencies = [
+ "frel-core",
+]
+
+[[package]]
+name = "frel-lib"
+version = "0.1.0"
+dependencies = [
+ "frel-core",
+ "frel-runtime",
+]
+
+[[package]]
+name = "frel-runtime"
+version = "0.1.0"
+dependencies = [
+ "frel-core",
+ "smallvec",
  "thunderdome",
 ]
 

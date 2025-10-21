@@ -1,7 +1,21 @@
 [workspace]
 resolver = "2"
 members = [
-    "frel",
+    "crates/frel",
+    "crates/frel-core",
+    "crates/frel-compiler",
+    "crates/frel-encoding",
+    "crates/frel-runtime",
+    "crates/frel-adapter/frel-adapter-browser",
+    "crates/frel-lib",
     "utils",
 ]
 
+
+[patch.crates-io]
+frel-core = { path = "crates/frel-core" }
+frel-compiler = { path = "crates/frel-compiler" }
+frel-encoding = { path = "crates/frel-encoding" }
+frel-runtime = { path = "crates/frel-runtime" }
+frel-lib = { path = "crates/frel-lib" }
+frel-adapter-browser = { path = "crates/frel-adapter/frel-adapter-browser" }

@@ -2,9 +2,24 @@
 <module type="EMPTY_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/crates/frel/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/frel/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/frel/adapter/browser/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/frel/compiler/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/frel/core/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/frel/encoding/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/frel/lib/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/frel/runtime/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/frel/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/frel/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/utils/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/frel-adapter/frel-adapter-browser/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/frel-compiler/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/frel-core/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/frel-encoding/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/frel-lib/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/frel-runtime/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/frel-runtime/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
