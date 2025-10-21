@@ -1,9 +1,3 @@
-# Context
-
-I am planning a reactive, multiplatform UI library in Rust. This document is just a plan
-I'm working on, not a final design specification, so it contains quite a few inconsistencies
-and there are problems not yet solved.
-
 # Goals
 
 **Main objective:** Build a modern, reactive, truly platform-independent UI library in Rust 
@@ -41,13 +35,13 @@ state (reactive)     transformation                             UI elements
     Defined in source code                        Built during runtime
 ```
 
-* [**Store**](30_runtime/stores.md)
+* [**Store**](../30_runtime/stores.md)
   A backend-neutral state container exposing reactive notifications to fragments and other stores.
 
 * **Fragment**
   A reusable declarative unit. A fragment can be headless (logic-only) or produce renderable content.
 
-* [**Scene**](30_runtime/scene.md)
+* [**Scene**](../30_runtime/scene.md)
   A collection of platform-independent UI nodes. Organizes all visual content into **channels**,
   **viewports**, and **layers**.
 
@@ -87,20 +81,20 @@ DSL Source
 
 ## Core Concepts
 
-* [**Fragment DSL**](10_language/dsl.md)
+* [**Fragment DSL**](../10_language/dsl.md)
   A declarative language for describing fragments.
 
-* [**Fragment Compiler (FC)**](20_compile/compiler.md)
+* [**Fragment Compiler (FC)**](../20_compile/compiler.md)
   The procedural macro that compiles the Fragment DSL into **Fragment IR (FIR)**.
 
-* [**Fragment Intermediate Representation (FIR)**](20_compile/fir.md)
+* [**Fragment Intermediate Representation (FIR)**](../20_compile/fir.md)
   A backend-agnostic program that describes how a fragment should be built, connected, and parameterized for later linking and rendering.
 
-* [**Fragment Linker (FL)**](30_runtime/linker.md)
+* [**Fragment Linker (FL)**](../30_runtime/linker.md)
   The runtime component that takes FIR definitions, instantiates fragments, and links them into a connected runtime tree with stores, actions, and derived values.
 
-* [**Fragment Renderer (FR)**](40_render/renderer.md)
+* [**Fragment Renderer (FR)**](../40_render/renderer.md)
   The runtime component that applies the linked runtime tree to a specific backend. It performs the initial build and then reacts to fine-grained notifications.
 
-* [**Fragment Instance**](30_runtime/instances.md)
+* [**Fragment Instance**](../30_runtime/instances.md)
   A concrete runtime instance of a fragment created by the Fragment Linker.
