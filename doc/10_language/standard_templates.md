@@ -1,8 +1,8 @@
-# Standard Fragments
+# Standard Fragment Templates
 
-These fragments are part of the standard library.
+These fragment templates are part of the standard library.
 
-## Basic fragments
+## Basic fragment templates
 
 ### Text
 

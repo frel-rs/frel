@@ -114,8 +114,8 @@ the key and goes on.
 
 ### Derived store subscription
 
-Derived stores subscribe to other stores. This subscription is performed by the linker at the
-time fragments instances are built by executing the IR.
+Derived stores subscribe to other stores. The linker performs this subscription when
+fragments are linked.
 
 When a derived store is removed, the runtime automatically removes all subscriptions to
 other stores.

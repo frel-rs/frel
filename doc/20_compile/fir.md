@@ -1,8 +1,8 @@
 # Fragment IR
 
-- The struct `FragmentIR` contains the IR of the fragment.
-- The Fragment Linker processes the IR to build fragment instances.
-- Once a fragment instance is built, the IR is not used anymore by that instance.
+- The struct `FragmentIR` contains the IR of a fragment template.
+- The Fragment Linker processes the IR to link fragments (creating handles, stores, and subscriptions).
+- Once a fragment is built, the IR is not used anymore by that fragment.
 
 Binary structure of the IR:
 
@@ -19,9 +19,9 @@ This format has been created to minimize the size of the generated code.
 
 ```rust
 const ARG_LEN_1 = 0x00;         // 1 byte for argument
-const ARG_LEN_2 = 0x01 << 6;   // 2 byte for argument
-const ARG_LEN_3 = 0x02 << 6;   // 3 byte for argument
-const ARG_LEN_4 = 0x03 << 6;   // 4 byte for argument
+const ARG_LEN_2 = 0x01 << 6;    // 2 byte for argument
+const ARG_LEN_3 = 0x02 << 6;    // 3 byte for argument
+const ARG_LEN_4 = 0x03 << 6;    // 4 byte for argument
 
 #[repr(C)]
 pub struct FragmentIR {
@@ -44,21 +44,21 @@ const OP_READABLE:      u8 = 2; // create a readable store
 const OP_DERIVED:       u8 = 3; // create a derived store
 const OP_WRITABLE:      u8 = 4; // create a writable store
 
-const OP_BEGIN:         u8 = 5; // create a new fragment instance
-const OP_ARG_PASS:      u8 = 6; // pass through an existing store to the current fragment instance
-const OP_ARG_CONST:     u8 = 7; // create a const store and use it as an external store for the current fragment instance
-const OP_ARG_READABLE:  u8 = 8; // create a readable store and use it as an external store for the current fragment instance
-const OP_ARG_DERIVED:   u8 = 9; // create a derived store and use it as an external store for the current fragment instance
-const OP_ARG_WRITABLE:  u8 = 10; // create a writable store and use it as an external store for the current fragment instance
+const OP_BEGIN:         u8 = 5; // begin a new fragment (create handle)
+const OP_ARG_PASS:      u8 = 6; // pass through an existing store to the current fragment
+const OP_ARG_CONST:     u8 = 7; // create a const store and use it as an external store for the current fragment
+const OP_ARG_READABLE:  u8 = 8; // create a readable store and use it as an external store for the current fragment
+const OP_ARG_DERIVED:   u8 = 9; // create a derived store and use it as an external store for the current fragment
+const OP_ARG_WRITABLE:  u8 = 10; // create a writable store and use it as an external store for the current fragment
 const OP_ARG_EH:        u8 = 11; // event handler
 
-const OP_END:           u8 = 62; // end of the current fragment instance
+const OP_END:           u8 = 62; // end of the current fragment
 ```
 
 Generated code example:
 
 ```rust
-/// This is a conceptual example for readibility.
+/// This is a conceptual example for readability.
 /// The macro would emit a constant binary BLOB for `ops`.
 ///
 /// stores:

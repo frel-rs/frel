@@ -15,7 +15,7 @@
 /crates/frel-encoding        # Event/Patch binary encodings shared by renderer<->adapter
 
 /crates/frel-runtime/        # 
-/crates/frel-runtime/linker  # FIR -> instance linker
+/crates/frel-runtime/linker  # FIR -> fragment linker (creates handles, stores, subscriptions)
 /crates/frel-runtime/store   # Reactive store implementation
 /crates/frel-runtime/render  # Instruction applier + layout engine + patch generation
 
