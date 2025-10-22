@@ -1,52 +1,4 @@
-# Fragment DSL
-
-1. **Fragment DSL** is a declarative language for describing fragment templates.
-2. The [**Fragment Compiler**](../20_compile/compiler.md) turns DSL fragment templates into the [**Fragment IR**](../20_compile/fir.md).
-
-Additional information:
-
-- [**Box Model**](box_model.md)
-- [**Standard Fragment Templates**](standard_templates.md)
-- [**Standard Instructions**](standard_instructions.md)
-- [**Resources**](resources.md)
-
-Example:
-
-```rust
-fragment! {
-   Counter(label : String) {
-      decl count = 0
-
-      column {
-         padding { 16 } .. border { Red, 1 }
-         
-         button {
-            on_click { count = count + 1 }
-            text { "Click me" }
-         }
-   
-         text { "${label}: ${count}" } .. text_small
-      }
-   }
-}
-```
-
-## Structure
-
-The DSL declares fragment templates, each having:
-
-- a name
-- external store declarations (parameters, optional)
-- building statements (optional)
-
-A building statement may be:
-
-- fragment creation
-- internal store declaration
-- rendering instruction
-- control structure
-
-## Store declarations
+# Store declarations
 
 `decl <id> [:<type>]? = <expr>`
 - **Kind:** const if <expr> reads no stores; derived if it reads stores.
@@ -89,7 +41,7 @@ A building statement may be:
   - `.buffer(latest|queue(n)|throttle(ms)|debounce(ms))` default: latest
 - **Typical producers:** interval(ms = 1000), fetch(|| …), sse(url, event = "…").
 
-### Syntax examples
+## Syntax examples
 
 ```dsl
 // decl — const and derived

@@ -85,7 +85,7 @@ DSL Source
 
 ## Core Concepts
 
-* [**Fragment DSL**](../10_language/dsl.md)
+* [**Fragment DSL**](../10_language/00_dsl.md)
   A declarative language for describing fragment templates.
 
 * [**Fragment Compiler (FC)**](../20_compile/compiler.md)
