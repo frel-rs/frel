@@ -1,5 +1,8 @@
 # Store declarations
 
+Store declarations define named reactive variables that participate in dependency tracking and
+notification propagation. Each store kind specifies ownership, mutability, and reactivity behavior.
+
 `decl <id> [:<type>]? = <expr>`
 - **Kind:** const if <expr> reads no stores; derived if it reads stores.
 - **Writes:** not assignable.

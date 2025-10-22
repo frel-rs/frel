@@ -68,7 +68,7 @@ pub trait Keyed {
 }
 ```
 
-### Loop Locals
+### Iteration Locals
 
 Each iteration provides read-only locals for convenience:
 
