@@ -185,6 +185,11 @@ pub trait Store {
 }
 ```
 
+## Data sources
+
+Data sources are stores that produce values from outside sources such as timers, network,
+etc.
+
 ## Planned improvements
 
 - Support for partial store subscriptions.

@@ -116,9 +116,9 @@ select on <enum-expr> {
 
 ### Semantics
 
+* Subscribes to all stores in the expressions.
 * Evaluates branches in order; **first match wins**.
-* Compiles to derived reactive expressions.
-* The enum-based form mirrors Rust’s pattern matching and integrates naturally with Rust enums.
+* When no `else` is present and none of the conditions match: emits an anchor node.
 
 ## `<bool-expr>` Definition
 
