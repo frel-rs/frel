@@ -209,6 +209,52 @@ shadow { color : Color offset_x : DIP offset_y : DIP deviation : DIP }
 
 Note: `border` is a mix of decoration and layout. Border width is accounted for in the layout.
 
+## Focus
+
+### Focusable
+
+`focusable { order: i32|false|programmatic }`
+
+> [!NOTE]
+> 
+> Scrolling automatically to the focused node is an implementation/adapter detail, it is
+> not specified in the language.
+> 
+
+Makes the node focusable.
+
+- `order` determines tab order (lower values focused first)
+- the default order is 0 (document order used for ties)
+- negative values are allowed (focused before positive)
+- `false` makes the node not focusable
+- `programmatic` makes the node skipped during tab navigation but focusable programmatically
+- when the focused node is removed, the next focusable node is focused
+
+**Shorthands**
+
+| Shorthand       | Full                  |
+|-----------------|-----------------------|
+| `focusable`     | `focusable { 0 }`     |
+| `not_focusable` | `focusable { false }` |
+
+### Autofocus
+
+`autofocus`
+
+- Node receives focus when created.
+- When more than one fragment has `autofocus`, the last-rendered wins.
+
+### Focus Trap
+
+`focus_trap`
+
+Tab/Shift+Tab cycles focus within this subtree.
+
+Escape key does not automatically exit the trap. Fragments may implement this behavior.
+
+In the case of nested focus traps, the inner trap takes precedence; tab cycles within the inner trap.
+When the inner trap is removed, Tab resumes in the outer trap.
+
 ## Event
 
 ```
@@ -221,13 +267,75 @@ on_primary_down { }
 on_primary_up { }
 on_secondary_down { }
 on_secondary_up { }
-on_key_down { }
-on_enter { }
 
 on_close { }
 
 no_pointer_events
 with_pointer_events
+```
+
+### Keyboard events
+
+Keyboard events are triggered when a keyboard action is performed by the user while the fragment 
+or **any of its children** has focus.
+
+`on_key |event: KeyEvent| { <event-handler> }`
+
+Convenience handlers:
+
+`on_enter { <event-handler> }`
+`on_escape { <event-handler> }`
+
+Convenience handlers fire once when the key is **first pressed** (Down action only).
+Repeats and key releases are ignored.
+
+Input events are triggered only on text input primitives when the composed text is ready:
+
+`on_input |event: InputEvent| { <event-handler> }`
+
+```rust
+// mod frel::keyboard
+
+struct KeyEvent {
+    action: KeyAction,
+    modifiers: u16,
+    key_name: &str,      // Physical key (e.g., "KeyA", "Digit1")
+}
+
+struct InputEvent {
+    character: &str      // Composed character (e.g., "A", "1", "Ω") - empty for non-printable
+}
+
+enum KeyAction {
+    Down,
+    Up,
+    Repeat
+}
+
+const KEY_MODIFIER_SHIFT: u16 = 0x01;
+const KEY_MODIFIER_CTRL: u16 = 0x02;
+const KEY_MODIFIER_ALT: u16 = 0x04;
+const KEY_MODIFIER_CMD: u16 = 0x08;
+
+
+mod key {
+    // Arrow keys
+    const ARROW_LEFT: &str = "ArrowLeft";    // or "Left" if you prefer
+    const ARROW_RIGHT: &str = "ArrowRight";
+    const ARROW_UP: &str = "ArrowUp";
+    const ARROW_DOWN: &str = "ArrowDown";
+
+    // Other keys
+    const BACKSPACE: &str = "Backspace";
+    const TAB: &str = "Tab";
+    const ENTER: &str = "Enter";
+    const ESCAPE: &str = "Escape";
+    const SPACE: &str = "Space";
+    const HOME: &str = "Home";
+    const END: &str = "End";
+    const PAGE_UP: &str = "PageUp";
+    const PAGE_DOWN: &str = "PageDown";
+}
 ```
 
 ### On Resize
@@ -242,6 +350,13 @@ are applied.
 - Size comparison uses a small epsilon to avoid false positives.
 
 **NOTE** Be careful with this event handler, so you don't trigger infinite loops.
+
+### Focus events
+
+Focus events are triggered when the fragment or **any of its children** gains or loses focus. 
+
+`on_focus { <event-handler> }`
+`on_blur { <event-handler> }`
 
 ## Text
 
