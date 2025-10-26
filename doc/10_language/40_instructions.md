@@ -6,6 +6,7 @@
 
 `<color>` is a 32-bit integer representing a color.
 
+
 ## Layout
 
 ### Position
@@ -186,6 +187,18 @@ These combinations on the same node generate a compile-time error:
 - `scroll { horizontal }` and `width { content }`
 - `scroll { vertical }` and `height { content }`
 
+### Channel and layer
+
+`channel { main|modal|snack|tooltip }`
+
+Sets the channel of the fragment and **all** its children.
+When not specified `main` is used.
+
+`layer { base|overlay }`
+
+Sets the layer of the fragment and **all** its children.
+When not specified `base` is used.
+
 ### Notes
 
 **Overflow** is supported only by scrolling. In my experience overflow clip and hidden are
@@ -255,23 +268,154 @@ Escape key does not automatically exit the trap. Fragments may implement this be
 In the case of nested focus traps, the inner trap takes precedence; tab cycles within the inner trap.
 When the inner trap is removed, Tab resumes in the outer trap.
 
+## Stereotype
+
+Stereotypes add semantic behavior to fragments.
+
+`stereotype { cancel|save }`
+
+**Scope:**
+
+- Search upward from a stereotyped element.
+- Fire handler on the first ancestor that has the event.
+- If there is no handler in the channel (considering only direct upward fragments, no horizontal search): 
+  - generate an error for pointer events
+  - ignore for keyboard events
+
+**Behavior:**
+
+- `cancel`: Triggers `on_cancel` event.
+- `save`: Triggers `on_save` event. 
+
+**Pointer handling:**
+
+- `cancel`: Clicking on the fragment triggers `on_cancel` event.
+- `save`: Clicking on the fragment triggers `on_save` event.
+
+**Keyboard shortcuts:**
+
+1. If there is no handler in the scope, the keyboard event is ignored.
+2. Otherwise, the current focus specifies what happens.
+
+> [!NOTE]
+> 
+> The focus-based behavior is designed to match user expectations
+> and avoid accidental navigation.
+>
+
+`Escape` → `on_cancel`
+  - there is no focused fragment in the scene **or**
+  - the focused fragment is the one with the `on_cancel` handler
+
+`Ctrl+S` → `on_save`
+  - with any focus situation
+      
+`Enter` → `on_save` **or** `on_cancel`
+  - current focus has `save` stereotype -> `on_save`
+  - current focus has `cancel` stereotype -> `on_cancel`
+
+```rust
+fragment! { 
+    Confirm(text: &str) {
+        channel { modal }
+
+        DefaultModal {
+            
+            text { "Are you sure?" }
+            button { "No" } .. stereotype { cancel }
+            button { "Yes" } .. stereotype { save }
+            
+            on_save { /* ... */ } 
+        }
+    }
+}
+```
+
 ## Event
 
+### Pointer events
+
+**Event propagation:** Pointer events fire only on the target fragment (no bubbling).
+
+```rust
+// mod frel::pointer
+
+struct PointerEvent {
+    target_id    : u32,   //  Logical node/instance id
+    phase        : u8,    //  0 move, 1 down, 2 up, 3 enter, 4 leave
+    pointer_kind : u8,    //  0 mouse, 1 touch, 2 pen
+    button       : u8,    //  primary=0, aux=1, secondary=2
+    buttons_mask : u16,   //  bitmask of primary=0, aux=1, secondary=2
+    modifiers    : u16,   //  same as in KeyEvent
+    pointer_id   : u32,   //
+    x_dip        : f32,   //  DIP - X coordinate relative to the fragment's top-left corner
+    y_dip        : f32,   //  DIP - Y coordinate relative to the fragment's top-left corner
+    pressure     : f32,   //  0..1 (mouse 0/0.5/1 as available)
+    tilt_x       : i16,   //  pen tilt deg
+    tilt_y       : i16,   //  pen tilt deg
+    tangential   : f32    //  0 if N/A
+}
+
+const PHASE_MOVE: u8 = 0;
+const PHASE_DOWN: u8 = 1;
+const PHASE_UP: u8 = 2;
+const PHASE_ENTER: u8 = 3;
+const PHASE_LEAVE: u8 = 4;
+
+const POINTER_KIND_MOUSE: u8 = 0;
+const POINTER_KIND_TOUCH: u8 = 1;
+const POINTER_KIND_PEN: u8 = 2;
+
+const BUTTON_PRIMARY: u8 = 0;
+const BUTTON_AUX: u8 = 1;
+const BUTTON_SECONDARY: u8 = 2;
 ```
-on_click { }
-on_double_click { }
-on_pointer_move { }
-on_pointer_enter { }
-on_pointer_leave { }
-on_primary_down { }
-on_primary_up { }
-on_secondary_down { }
-on_secondary_up { }
 
-on_close { }
+```
+on_click |event: PointerEvent| { <event-handler> }
+on_double_click |event: PointerEvent| { <event-handler> }
+on_pointer_move |event: PointerEvent| { <event-handler> }
+on_pointer_enter |event: PointerEvent| { <event-handler> }
+on_pointer_leave |event: PointerEvent| { <event-handler> }
+on_primary_down |event: PointerEvent| { <event-handler> }
+on_primary_up |event: PointerEvent| { <event-handler> }
+on_secondary_down |event: PointerEvent| { <event-handler> }
+on_secondary_up |event: PointerEvent| { <event-handler> }
+```
 
-no_pointer_events
-with_pointer_events
+#### Suppressing pointer events
+
+`pointer_events { enabled|disabled }`
+
+`enabled` enables the pointer events for the fragment and **all** its children.
+`disabled` disables the pointer events for the fragment and **all** its children.
+
+When `enabled` is used in a child of a `disabled` parent, the child receives pointer events.
+
+**Shorthands**
+
+| Shorthand             | Full                          |
+|-----------------------|-------------------------------|
+| `with_pointer_events` | `pointer_events { enabled }`  |
+| `no_pointer_events`   | `pointer_events { disabled }` |
+
+### Wheel events
+
+`on_wheel |event: WheelEvent| { <event-handler> }`
+
+```rust
+// mod frel::wheel
+
+struct WheelEvent {
+    modifiers : u16,
+    delta_x   : f32,    // DIP - horizontal scroll delta
+    delta_y   : f32,    // DIP - vertical scroll delta  
+    phase     : u8,     // 0=update, 1=begin, 2=end
+}
+
+const WHEEL_PHASE_UPDATE: u8 = 0;
+const WHEEL_PHASE_BEGIN: u8 = 1;
+const WHEEL_PHASE_END: u8 = 2;
 ```
 
 ### Keyboard events
@@ -320,7 +464,7 @@ const KEY_MODIFIER_CMD: u16 = 0x08;
 
 mod key {
     // Arrow keys
-    const ARROW_LEFT: &str = "ArrowLeft";    // or "Left" if you prefer
+    const ARROW_LEFT: &str = "ArrowLeft";
     const ARROW_RIGHT: &str = "ArrowRight";
     const ARROW_UP: &str = "ArrowUp";
     const ARROW_DOWN: &str = "ArrowDown";
@@ -357,6 +501,13 @@ Focus events are triggered when the fragment or **any of its children** gains or
 
 `on_focus { <event-handler> }`
 `on_blur { <event-handler> }`
+
+### Stereotype events
+
+Stereotype events provide semantic handlers for stereotype generated events.
+
+`on_cancel { <event-handler> }`
+`on_save { <event-handler> }`
 
 ## Text
 
