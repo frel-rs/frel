@@ -78,6 +78,7 @@ Parameters supply inputs and wiring for reactivity from parents into the fragmen
 - [**Fragment creation**](./20_fragment_creation.md)
 - [**Control statements**](./30_control_statements.md)
 - [**Instructions**](./40_instructions.md)
+- [**Detached UI**](./50_detached_ui.md)
 
 ## Example
 

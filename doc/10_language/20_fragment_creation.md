@@ -129,3 +129,29 @@ column { at content: TwoLabels }
 // 5. Postfix styling
 button { text { "Click" } } .. padding { 8 } .. border { Red, 1 }
 ```
+
+## Built-in Slots
+
+### Tooltip Slot
+
+All fragments support an optional `tooltip` slot for contextual help:
+
+```dsl
+button {
+    "Save"
+    at tooltip: {
+        text { "Ctrl+S to save" }
+        .. padding { 6 }
+        .. background { color: Black }
+        .. font { color: White }
+    }
+}
+```
+
+The tooltip automatically:
+- Renders in the `tooltip` channel
+- Shows on hover with 500ms delay
+- Hides when pointer leaves
+- Positions relative to parent (smart repositioning if needed)
+
+See [Detached UI - Tooltip](./50_detached_ui.md#tooltip) for full details.

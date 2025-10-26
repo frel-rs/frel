@@ -18,6 +18,8 @@ These fragment templates are part of the standard library.
 
 ### Box
 
+Box is a positional container.
+
 Positions its children:
 
 - directly with x and y coordinates **or**

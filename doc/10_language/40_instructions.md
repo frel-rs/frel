@@ -4,8 +4,26 @@
 
 ## Color
 
-`<color>` is a 32-bit integer representing a color.
+`<color>` is a 32-bit RGBA value representing a color.
 
+**Supported formats:**
+
+- `0xRRGGBB` - Hex RGB (alpha defaults to 255/opaque)
+- `0xRRGGBBAA` - Hex RGBA
+- `rgb(r, g, b)` - RGB components (0-255, alpha defaults to 255)
+- `rgba(r, g, b, a)` - RGBA components (0-255)
+- `<color-name>` - Named color constant (e.g., `Red`, `Blue`, `Transparent`)
+
+**Examples:**
+
+```dsl
+background { color: 0xFF0000 }           // Red (opaque)
+background { color: 0xFF0000FF }         // Red (opaque, explicit alpha)
+background { color: rgb(255, 0, 0) }     // Red
+background { color: rgba(255, 0, 0, 128) } // Red, 50% transparent
+background { color: Red }                // Named color
+border { color: Blue }                   // Named color in border
+```
 
 ## Layout
 
@@ -15,7 +33,7 @@
 
 Places the node at the given position.
 
-**IMPORTANT**: Only positional containers support this instruction.
+**IMPORTANT**: Only positional containers (Box) support this instruction.
 
 Note: `top` and `left` are relative to the `top` and `left` of the container **content box**
 (that is without the surrounding).
@@ -75,11 +93,12 @@ All the dimensions are optional, but at least one must be specified.
 
 NOTE: `color` may be used with any of the shorthands when `<type>` is `border`.
 
-| Shorthand                     | Full                                                      |
-|-------------------------------|-----------------------------------------------------------|
-| `<type> { horizontal : DIP }` | `<type> { left: DIP right : DIP }`                        |
-| `<type> { vertical : DIP }`   | `<type> { top: DIP bottom : DIP }`                        |
-| `<type> { DIP }`              | `<type> { top: DIP right : DIP bottom : DIP left : DIP }` |
+| Shorthand                     | Full                                                                  |
+|-------------------------------|-----------------------------------------------------------------------|
+| `<type> { horizontal : DIP }` | `<type> { left: DIP right : DIP }`                                    |
+| `<type> { vertical : DIP }`   | `<type> { top: DIP bottom : DIP }`                                    |
+| `<type> { DIP }`              | `<type> { top: DIP right : DIP bottom : DIP left : DIP }`             |
+| `border { <color> DIP }`      | `border { top: DIP right: DIP bottom: DIP left: DIP color: <color> }` |
 
 ### Fill strategy
 
@@ -87,7 +106,7 @@ NOTE: `color` may be used with any of the shorthands when `<type>` is `border`.
 fill_strategy { constrain|constrain_reverse|resize_to_max }
 ```
 
-Specifies how a directional algorithmic container (such as row or column) should fill its children.
+Specifies how a directional algorithmic container (row and column) should fill its children.
 
 - `constrain` : The children are measured one-by-one. The space used by **earlier** children is subtracted from the space available to **later** children.
 - `constrain_reverse` : The children are measured one-by-one. The space used by **later** children is subtracted from the space available to **earlier** children.
@@ -117,7 +136,7 @@ Both dimensions are optional, but at least one must be specified.
 
 ### Inner Alignment
 
-`<target> { horizontal: (start|center|end) vertical: (<top|center|baseline|bottom>) }`
+`<target> { horizontal: (start|center|end) vertical: (top|center|baseline|bottom) }`
 
 `<target>` may be one of:
 
@@ -150,7 +169,8 @@ align_items_center_bottom
 
 `align_relative { horizontal: (before|start|center|end|after) vertical : (above|start|center|end|below)  }`
 
-Note: `align_relative` is used mostly by popups to align themselves to the component they are relative to.
+Note: `align_relative` is used primarily by popups to align themselves to the element they are relative to.
+See [Detached UI - Tooltip](./50_detached_ui.md#tooltip).
 
 The following diagram shows the positions for each alignment. The corners/edges touch the node 
 they are relative to (end/start at the previous/next pixel).
@@ -184,20 +204,13 @@ All child sizes (including your “margins are part of size” rule) contribute 
 `scroll { <dir> }` and `<dim> { content }` are mutually exclusive in the given direction.
 These combinations on the same node generate a compile-time error:
 
-- `scroll { horizontal }` and `width { content }`
-- `scroll { vertical }` and `height { content }`
+- `box { } .. width { content } .. scroll { horizontal } // ERROR`
+- `box { } .. height { content } .. scroll { vertical } // ERROR`
 
-### Channel and layer
+All other combinations are valid, for example:
 
-`channel { main|modal|snack|tooltip }`
-
-Sets the channel of the fragment and **all** its children.
-When not specified `main` is used.
-
-`layer { base|overlay }`
-
-Sets the layer of the fragment and **all** its children.
-When not specified `base` is used.
+- `box { } .. height { container } .. scroll { vertical } // OK`
+- `box { } .. width { content } .. scroll { vertical } // OK`
 
 ### Notes
 
@@ -206,21 +219,130 @@ tools junior developers use to hide layout bugs.
 
 ## Decoration
 
+**Notes:**
+
+- Border is documented in the Layout section (Surrounding)
+- Border is a mix of decoration and layout - its width affects layout calculations
+
+### Background
+
+`background { color: <color> }`
+`background { color: <color> opacity: f32 }`
+`background { gradient: <gradient> }`
+`background { image: <image-resource> }`
+
+Fills the background of the fragment's content box and padding area.
+
+**Parameters:**
+
+- `color` - Background color (see Color section above)
+- `opacity` - Alpha multiplier (0.0 = transparent, 1.0 = opaque), applied to the color
+- `gradient` - Gradient fill (linear or radial)
+- `image` - Image resource to fill background
+
+**Examples:**
+
+```dsl
+box { } .. background { color: White }
+box { } .. background { color: Red opacity: 0.5 }
+box { } .. background { gradient: linear(Red, Blue) }
+box { } .. background { image: "background.png" }
 ```
-color { rgba: u32 }
-color { rgb: u32  opacity: f32 }
 
-background { color: Color }
-background { color: Color opacity: f32 }
-background { gradient: Gradient }
-background { image : ImageResource }
+**Notes:**
 
-corner_radius { top : DIP right : DIP bottom : DIP left : DIP }
+- Background is painted behind content and padding, but not margin
+- When using `opacity`, it multiplies with the color's alpha channel
+- Image backgrounds are stretched to fill the content box
 
-shadow { color : Color offset_x : DIP offset_y : DIP deviation : DIP }
+### Corner Radius
+
+`corner_radius { top_left: DIP top_right: DIP bottom_left: DIP bottom_right: DIP }`
+
+Rounds the corners of the fragment's border box.
+
+**Parameters:**
+
+- `top_left` - Top-left corner radius
+- `top_right` - Top-right corner radius
+- `bottom_left` - Bottom-left corner radius
+- `bottom_right` - Bottom-right corner radius
+
+All parameters are optional.
+
+**Shorthands:**
+
+| Shorthand                       | Full                                                                                |
+|---------------------------------|-------------------------------------------------------------------------------------|
+| `corner_radius { DIP }`         | `corner_radius { top_left: DIP top_right: DIP bottom_left: DIP bottom_right: DIP }` |
+| `corner_radius { bottom: DIP }` | `corner_radius { bottom_left: DIP bottom_right: DIP }`                              |
+| `corner_radius { top: DIP }`    | `corner_radius { top_left: DIP top_right: DIP }`                                    |
+| `corner_radius { left: DIP }`   | `corner_radius { top_left: DIP bottom_left: DIP }`                                  |
+| `corner_radius { right: DIP }`  | `corner_radius { top_right: DIP bottom_right: DIP }`                                |
+
+
+**Examples:**
+
+```dsl
+box { } .. corner_radius { 8 }                               // All corners 8 DIP
+box { } .. corner_radius { top_left: 8 bottom_right: 4 }     // Individual corners
+box { } .. corner_radius { right: 8 }                        // Top right and bottom right
 ```
 
-Note: `border` is a mix of decoration and layout. Border width is accounted for in the layout.
+**Notes:**
+
+- Corner radius is clamped to half the width/height to prevent overlapping
+- Applied to background, border, and shadow
+
+### Shadow
+
+`shadow { color: <color> offset_x: DIP offset_y: DIP blur: DIP }`
+
+Adds a drop shadow to the fragment.
+
+**Parameters:**
+
+- `color` - Shadow color (including alpha for transparency)
+- `offset_x` - Horizontal offset (positive = right, negative = left)
+- `offset_y` - Vertical offset (positive = down, negative = up)
+- `blur` - Blur radius (0 = sharp, higher = softer)
+
+**Examples:**
+
+```dsl
+box { } .. shadow { color: rgba(0, 0, 0, 128) offset_x: 0 offset_y: 2 blur: 4 }
+box { } .. shadow { color: 0x00000080 offset_x: 4 offset_y: 4 blur: 8 }
+```
+
+**Notes:**
+
+- Shadow is rendered outside the element's box (does not affect layout)
+- Multiple shadows are not currently supported
+- Shadow follows the corner radius if specified
+
+### Cursor
+
+`cursor { default|pointer|text|crosshair|move|none|grab|grabbing }`
+
+Sets the mouse cursor appearance when hovering over the fragment.
+
+**Values:**
+
+- `default` - Standard arrow cursor
+- `pointer` - Pointing hand (for clickable elements)
+- `text` - I-beam cursor (for text input)
+- `crosshair` - Crosshair
+- `move` - Move cursor (for draggable elements)
+- `none` - Do not show cursor
+- `grab` - Open hand (for draggable)
+- `grabbing` - Closed hand (while dragging)
+
+**Example:**
+
+```dsl
+button { } .. cursor { pointer }
+text_input { } .. cursor { text }
+```
 
 ## Focus
 
@@ -317,10 +439,8 @@ Stereotypes add semantic behavior to fragments.
 ```rust
 fragment! { 
     Confirm(text: &str) {
-        channel { modal }
-
         DefaultModal {
-            
+      
             text { "Are you sure?" }
             button { "No" } .. stereotype { cancel }
             button { "Yes" } .. stereotype { save }
@@ -407,7 +527,7 @@ When `enabled` is used in a child of a `disabled` parent, the child receives poi
 // mod frel::wheel
 
 struct WheelEvent {
-    modifiers : u16,
+    modifiers : u16,    // Uses KEY_MODIFIER_* constants from keyboard module
     delta_x   : f32,    // DIP - horizontal scroll delta
     delta_y   : f32,    // DIP - vertical scroll delta  
     phase     : u8,     // 0=update, 1=begin, 2=end
@@ -422,6 +542,9 @@ const WHEEL_PHASE_END: u8 = 2;
 
 Keyboard events are triggered when a keyboard action is performed by the user while the fragment 
 or **any of its children** has focus.
+
+**Event propagation:** The first event handler upwards (same channel, no horizontal) from the
+focused fragment is called.
 
 `on_key |event: KeyEvent| { <event-handler> }`
 
@@ -511,14 +634,205 @@ Stereotype events provide semantic handlers for stereotype generated events.
 
 ## Text
 
-`SP` : Scaled Pixel
+**SP (Scaled Pixel):** A unit that scales with the platform's text scaling settings.
 
+Unlike DIP which remains constant, SP adjusts when users change their system font size preferences.
+Use SP for font sizes to respect accessibility settings.
+
+### Font
+
+`font { name: String size: SP weight: u32 color: <color> }`
+
+Sets font properties for text content.
+
+**Parameters:**
+
+- `name` - Font family name (e.g., "Arial", "system-ui", or custom font identifier)
+- `size` - Font size in SP (Scaled Pixels)
+- `weight` - Font weight from 100 (thin) to 900 (black)
+  - 100 = Thin
+  - 200 = Extra Light
+  - 300 = Light
+  - 400 = Normal/Regular
+  - 500 = Medium
+  - 600 = Semi Bold
+  - 700 = Bold
+  - 800 = Extra Bold
+  - 900 = Black
+- `color` - Text color (see [Color](#color))
+
+All parameters are optional.
+
+**Examples:**
+
+```dsl
+text { "Hello" } .. font { name: "Arial" size: 16 weight: 400 color: Black }
+text { "Title" } .. font { size: 24 weight: 700 }
+text { "Body" } .. font { name: "system-ui" }
 ```
-font { name : String size : SP weight : u32 color : Color}
-line_height { height : DIP }
-no_select
-text_wrap { none|wrap }
-underline
-small_caps
-letter_spacing { value : f64 }
+
+**Shorthands:**
+
+Common font combinations can be defined as style templates (see Resources documentation).
+
+**Notes:**
+
+- If font name is not available, platform-specific fallback is used
+- Weight values between defined values may be rounded to nearest available weight
+- SP scales with user's accessibility settings, DIP does not
+
+### Line Height
+
+`line_height { height: DIP }`
+
+Sets the vertical spacing between lines of text.
+
+**Parameters:**
+
+- `height` - Line height in DIP (Device Independent Pixels)
+
+**Examples:**
+
+```dsl
+text { "..." } .. line_height { 20 }     // Fixed 20 DIP
+text { "..." } .. line_height { 24 }     // More spacious
 ```
+
+**Notes:**
+
+- Line height is the total height from baseline to baseline
+- Typical ratio is 1.2-1.5 times the font size
+- Measured in DIP (not SP) for consistent spacing regardless of text scaling
+
+### Text Selection
+
+`no_select`
+
+Prevents text from being selectable by the user.
+
+**Example:**
+
+```dsl
+text { "Button Label" } .. no_select
+```
+
+**Notes:**
+- Useful for UI chrome, buttons, and labels
+- By default, text is selectable
+
+### Text Wrapping
+
+`text_wrap { none|wrap }`
+
+Controls how text handles overflow.
+
+**Values:**
+
+- `none` - Single line, text overflows if too wide
+- `wrap` - Multi-line, wraps at word boundaries
+
+**Examples:**
+
+```dsl
+text { "Short" } .. text_wrap { none }
+text { "Long paragraph..." } .. text_wrap { wrap }
+```
+
+**Notes:**
+- `none` combined with width constraints may clip text
+- Use `text_overflow` from primitives for ellipsis behavior
+- Wrapping respects word boundaries (no mid-word breaks by default)
+
+### Text Overflow
+
+`text_overflow { visible|ellipsis }`
+
+Controls how overflowing text is displayed (only applies to single-line text).
+
+**Values:**
+
+- `visible` - Text overflows its container
+- `ellipsis` - Text is clipped and "..." is shown
+
+**Example:**
+
+```dsl
+text { "Very long text..." } .. text_wrap { none } .. text_overflow { ellipsis }
+```
+
+**Notes:**
+- Only effective when `text_wrap { none }` is set
+- Requires a width constraint on the text element
+
+### Text Decoration
+
+`underline`
+
+Adds an underline to the text.
+
+**Example:**
+
+```dsl
+text { "Link" } .. underline .. font { color: Blue }
+```
+
+**Notes:**
+- Underline color matches the text color
+- Other decorations (strikethrough, overline) are not currently supported
+
+### Text Transform
+
+`small_caps`
+
+Renders lowercase letters as smaller capitals.
+
+**Example:**
+
+```dsl
+text { "Title" } .. small_caps
+```
+
+**Notes:**
+- True small caps use font's small-caps glyphs if available
+- Otherwise, synthesized by scaling capitals
+
+### Letter Spacing
+
+`letter_spacing { value: f64 }`
+
+Adjusts spacing between characters.
+
+**Parameters:**
+
+- `value` - Additional spacing in DIP (can be negative)
+
+**Examples:**
+
+```dsl
+text { "Spaced" } .. letter_spacing { 2.0 }     // Wider spacing
+text { "Tight" } .. letter_spacing { -0.5 }     // Tighter spacing
+text { "Normal" } .. letter_spacing { 0.0 }     // Default
+```
+
+**Notes:**
+- Positive values increase spacing
+- Negative values decrease spacing
+- Measured in DIP for consistent spacing
+- Affects all characters equally
+
+### Text Alignment
+
+Text alignment is handled by the container's `align_items` or the `text` fragment's 
+`align_self` instruction (see [Layout](#layout)).
+
+Text alignment is layout-based and is handled by the container. The `text` fragment 
+does not align the text within itself.
+
+For horizontal alignment within a container:
+
+- `align_items { horizontal: start }` - Left-aligned text
+- `align_items { horizontal: center }` - Center-aligned text
+- `align_items { horizontal: end }` - Right-aligned text
+- `text { "Hello" } .. align_self_start` - Left-aligned text
+- `text { "Hello" } .. align_self_center` - Center-aligned text
+- `text { "Hello" } .. align_self_end` - Right-aligned text
